@@ -1,0 +1,17 @@
+backend:
+  name: git-gateway
+  repo: seif1hamdy028-lab/tech-artifacts # اسم حسابك واسم المستودع
+  branch: main
+media_folder: "images" # المجلد الذي ستُحفظ فيه الصور
+public_folder: "/images"
+
+collections:
+  - name: "blog"
+    label: "المقالات"
+    folder: "posts" # المجلد الذي ستُحفظ فيه المقالات كملفات Markdown
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "العنوان", name: "title", widget: "string" }
+      - { label: "تاريخ النشر", name: "date", widget: "datetime" }
+      - { label: "محتوى المقال", name: "body", widget: "markdown" }
