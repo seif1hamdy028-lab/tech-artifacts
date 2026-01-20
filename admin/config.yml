@@ -1,17 +1,6 @@
 backend:
-  name: git-gateway
-  branch: main # تأكد أن هذا هو اسم الفرع في GitHub (غالباً main أو master)
-
-media_folder: "images" # المجلد الذي ستُحفظ فيه الصور
-public_folder: "/images"
-
-collections:
-  - name: "blog"
-    label: "المقالات"
-    folder: "posts" # المجلد الذي ستُحفظ فيه المقالات كملفات Markdown
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - { label: "العنوان", name: "title", widget: "string" }
-      - { label: "تاريخ النشر", name: "date", widget: "datetime" }
-      - { label: "محتوى المقال", name: "body", widget: "markdown" }
+  name: github
+  repo: seif1hamdy028-lab/tech-artifacts
+  branch: master # تأكد هل هو master أم main في حسابك
+  base_url: https://github.com
+  auth_endpoint: oauth/authorize

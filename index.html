@@ -3,124 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tech-artifacts</title>
-    <head>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-</head>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <title>مدونة التحف التقنية</title>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --bg-color: #f8fafc;
-            --text-color: #1e293b;
-        }
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: white;
-            padding: 2rem 0;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        .blog-post {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .blog-post:hover {
-            transform: translateY(-5px);
-        }
-        .post-date {
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-        .post-title {
-            color: var(--primary-color);
-            margin: 0.5rem 0;
-        }
-        .post-content {
-            line-height: 1.8;
-        }
-        footer {
-            text-align: center;
-            padding: 2rem;
-            color: #94a3b8;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { text-align: center; color: #1a73e8; }
+        .post-card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-right: 5px solid #1a73e8; }
+        .post-title { margin: 0 0 10px 0; color: #333; }
+        .post-date { font-size: 0.85em; color: #666; margin-bottom: 15px; }
+        .post-content { color: #444; line-height: 1.6; }
+        .loading { text-align: center; font-size: 1.2em; color: #666; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>مرحباً بكم في مدونتي 📝</h1>
-    <p>أشارككم هنا أفكاري ومقالاتي الجديدة</p>
-</header>
-
-<div class="container" id="posts-container">
-    </div>
-
-<footer>
-    <p>جميع الحقوق محفوظة &copy; 2024</p>
-</footer>
+<div class="container">
+    <h1>مرحباً بكم في مدونتي 🚀</h1>
+    <div id="blog-posts" class="loading">جاري جلب المقالات من المستودع...</div>
+</div>
 
 <script>
-    // --- هنا يمكنك إضافة مقالاتك بسهولة ---
-    const myPosts = [
-        {
-            title: "كيف بدأت رحلتي في تعلم البرمجة",
-            date: "15 أكتوبر 2024",
-            content: "البرمجة ليست مجرد كتابة أكواد، بل هي طريقة تفكير لحل المشكلات. بدأت رحلتي بتعلم HTML و CSS..."
-        },
-        {
-            title: "أفضل الأدوات لتطوير المواقع في 2024",
-            date: "12 أكتوبر 2024",
-            content: "هناك العديد من الأدوات التي تسهل حياة المبرمج، منها VS Code و Netlify و GitHub..."
-        },
-        {
-            title: "لماذا اخترت استضافة Netlify؟",
-            date: "10 أكتوبر 2024",
-            content: "تعتبر Netlify من أسرع وأسهل المنصات لرفع المواقع الثابتة وتوفر ميزات رائعة مجاناً."
-        }
-    ];
+    async function fetchMyPosts() {
+        const container = document.getElementById('blog-posts');
+        // تأكد أن هذه البيانات تطابق حسابك 100%
+        const username = "seif1hamdy028-lab";
+        const repo = "tech-artifacts";
+        const folder = "posts";
 
-    // وظيفة لعرض المقالات في الصفحة
-    function displayPosts() {
-        const container = document.getElementById('posts-container');
-        container.innerHTML = myPosts.map(post => `
-            <article class="blog-post">
-                <div class="post-date">${post.date}</div>
-                <h2 class="post-title">${post.title}</h2>
-                <p class="post-content">${post.content}</p>
-            </article>
-        `).join('');
+        try {
+            // 1. جلب قائمة الملفات من فولدر posts
+            const response = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/${folder}`);
+            
+            if (!response.ok) throw new Error("لا توجد مقالات حالياً");
+
+            const files = await response.json();
+            container.innerHTML = ""; // مسح كلمة جاري التحميل
+
+            // 2. قراءة كل ملف .md وعرضه
+            for (const file of files) {
+                if (file.name.endsWith('.md')) {
+                    const contentResponse = await fetch(file.download_url);
+                    const rawText = await contentResponse.text();
+
+                    // استخراج العنوان والتاريخ والمحتوى ببساطة
+                    const title = rawText.match(/title:\s*(.*)/)?.[1]?.replace(/['"]/g, '') || "عنوان غير معروف";
+                    const date = rawText.match(/date:\s*(.*)/)?.[1] || "تاريخ غير معروف";
+                    const content = rawText.split('---').pop().trim();
+
+                    // إضافة المقال للصفحة
+                    const postHTML = `
+                        <div class="post-card">
+                            <h2 class="post-title">${title}</h2>
+                            <div class="post-date">📅 تاريخ النشر: ${date}</div>
+                            <div class="post-content">${content.substring(0, 200)}...</div>
+                        </div>
+                    `;
+                    container.innerHTML += postHTML;
+                }
+            }
+        } catch (error) {
+            container.innerHTML = `<p style="text-align:center">لم يتم العثور على مقالات. تأكد من وجود مجلد باسم <b>posts</b> داخل مستودعك وبه ملفات تنتهي بـ <b>.md</b></p>`;
+        }
     }
 
-    // تشغيل الوظيفة عند تحميل الصفحة
-    displayPosts();
-</script>
-
-<script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-      if (!user) {
-        window.netlifyIdentity.on("login", () => {
-          document.location.href = "/admin/";
-        });
-      }
-    });
-  }
+    fetchMyPosts();
 </script>
 
 </body>
